@@ -278,8 +278,9 @@ unset($__errorArgs, $__bag); ?>
             <div>
                 <label for="angkatan" class="block text-sm font-medium text-slate-700 mb-1">Angkatan</label>
                 <?php $angkatan = old('angkatan', $member->angkatan ?? ''); ?>
-                <select id="angkatan" name="angkatan"
-                        class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-sky-500 focus:ring-sky-500 <?php $__errorArgs = ['angkatan'];
+                <input type="text" id="angkatan" name="angkatan" list="angkatan-suggestions" value="<?php echo e($angkatan); ?>"
+                       placeholder="Contoh: Angkatan XXIII (2027)"
+                       class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-sky-500 focus:ring-sky-500 <?php $__errorArgs = ['angkatan'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -287,11 +288,12 @@ $message = $__bag->first($__errorArgs[0]); ?> border-red-400 <?php unset($messag
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>">
-                    <option value="">Belum ditentukan</option>
+                <datalist id="angkatan-suggestions">
                     <?php $__currentLoopData = \App\Models\Member::ANGKATAN_OPTIONS; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opt): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <option value="<?php echo e($opt); ?>" <?php if($angkatan === $opt): echo 'selected'; endif; ?>><?php echo e($opt); ?></option>
+                        <option value="<?php echo e($opt); ?>"></option>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                </select>
+                </datalist>
+                <p class="mt-1 text-xs text-slate-400">Bebas diisi/diedit — ketik angkatan baru jika belum ada di saran.</p>
                 <?php $__errorArgs = ['angkatan'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :

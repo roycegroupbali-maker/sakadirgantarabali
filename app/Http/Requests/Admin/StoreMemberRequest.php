@@ -30,7 +30,7 @@ class StoreMemberRequest extends FormRequest
             'email' => ['nullable', 'email', 'max:255'],
             'asal_sekolah' => ['nullable', 'string', 'max:255'],
             'pangkalan_id' => ['nullable', 'exists:pangkalans,id'],
-            'angkatan' => ['nullable', Rule::in(Member::ANGKATAN_OPTIONS)],
+            'angkatan' => ['nullable', 'string', 'max:100'],
             'jenjang' => ['nullable', Rule::in(Member::JENJANG_OPTIONS)],
             'krida' => ['nullable', 'string', 'max:255'],
             'jabatan' => ['nullable', 'string', 'max:255'],

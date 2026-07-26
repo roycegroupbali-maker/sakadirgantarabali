@@ -38,7 +38,10 @@ class Member extends Model
     public const JENJANG_OPTIONS = ['Purwa', 'Madya', 'Utama'];
 
     /**
-     * Pilihan tetap untuk field "Angkatan". Diurut dari yang terbaru.
+     * Saran (datalist) untuk field "Angkatan" pada form admin. Field ini kini
+     * berupa input teks bebas (dapat ditambah/diedit sesuai kebutuhan); daftar
+     * ini hanya membantu pengisian cepat dan tidak membatasi nilai yang boleh
+     * disimpan.
      */
     public const ANGKATAN_OPTIONS = [
         'Angkatan XXII (2026)',

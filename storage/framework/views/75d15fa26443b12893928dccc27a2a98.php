@@ -28,6 +28,8 @@
                         ['route' => 'admin.gallery.index', 'label' => 'Galeri', 'icon' => 'photo'],
                         ['route' => 'admin.members.index', 'label' => 'Data Anggota', 'icon' => 'users'],
                         ['route' => 'admin.pangkalan.index', 'label' => 'Pangkalan', 'icon' => 'map-pin'],
+                        ['route' => 'admin.pendaftaran.index', 'label' => 'Pendaftaran', 'icon' => 'user-plus', 'badge' => \App\Models\Registration::where('status', 'Menunggu Verifikasi')->count()],
+                        ['route' => 'admin.aspirasi.index', 'label' => 'Aspirasi & Laporan', 'icon' => 'inbox', 'badge' => \App\Models\Aspiration::where('status', 'Menunggu Verifikasi')->count()],
                     ];
                 ?>
 
@@ -37,7 +39,10 @@
                        class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
                               <?php echo e($active ? 'bg-sky-600 text-white shadow' : 'text-slate-300 hover:bg-slate-800 hover:text-white'); ?>">
                         <?php echo $__env->make('admin.components.icon', ['name' => $item['icon']], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
-                        <span><?php echo e($item['label']); ?></span>
+                        <span class="flex-1"><?php echo e($item['label']); ?></span>
+                        <?php if(!empty($item['badge'])): ?>
+                            <span class="text-[11px] font-semibold px-1.5 py-0.5 rounded-full <?php echo e($active ? 'bg-white text-sky-700' : 'bg-amber-500 text-white'); ?>"><?php echo e($item['badge']); ?></span>
+                        <?php endif; ?>
                     </a>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </nav>

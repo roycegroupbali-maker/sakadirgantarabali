@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
 <title>Saka Dirgantara — Kwartir Daerah Bali</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -41,7 +42,7 @@
   <section class="hero">
     <div class="hero-grid"></div>
     <div class="wrap">
-      <div class="eyebrow">Satuan Karya Pramuka · Bidang Kedirgantaraan</div>
+      <div class="eyebrow">Satuan Karya Pramuka Dirgantara Lanud I Gusti Ngurah Rai Bali</div>
       <h1>Membina Generasi Muda untuk <em>Angkasa Indonesia</em></h1>
       <p class="lead">Saka Dirgantara merupakan wadah pendidikan bagi anggota Gerakan Pramuka untuk menyalurkan minat, mengembangkan pengetahuan, keterampilan, kecakapan, pengalaman, dan kepemimpinan di bidang kedirgantaraan. Melalui pembinaan bersama TNI Angkatan Udara dan dukungan berbagai mitra di bidang penerbangan, Saka Dirgantara membentuk generasi muda yang disiplin, berkarakter, serta memiliki wawasan kebangsaan dan semangat pengabdian kepada masyarakat.</p>
       <div class="btnrow">
@@ -473,6 +474,7 @@
             <h3 style="font-family:var(--display);font-size:19px;">Laporan Berhasil Dikirim</h3>
             <p style="color:var(--text-muted);margin-top:8px;">Simpan nomor tiket berikut untuk memeriksa status laporan Anda:</p>
             <div class="lap-id" id="lap-success-id"></div>
+            <p style="color:var(--text-muted);margin-top:8px;font-size:12.5px;">Konfirmasi beserta nomor tiket ini juga telah dikirim ke email yang Anda daftarkan.</p>
             <div><button class="btn ghost" onclick="lapResetForm()">Ajukan Laporan Lain</button></div>
           </div>
         </div>
@@ -492,37 +494,11 @@
 
       <!-- TAB: ADMIN -->
       <div class="lap-panel" id="lap-tab-admin">
-        <div class="lap-admin-gate" id="lap-admin-gate">
+        <div class="lap-admin-gate">
           <span class="tag" style="justify-content:center;">Akses Terbatas</span>
-          <h3 style="font-family:var(--display);font-size:18px;">Masuk sebagai Admin</h3>
-          <p style="font-size:12.5px;color:var(--text-dim);">Panel demo — tanpa autentikasi server sungguhan.</p>
-          <input type="password" id="lap-admin-pass" placeholder="Masukkan kode akses (demo: admin)">
-          <button class="btn gold" style="width:100%;" onclick="lapAdminLogin()">Masuk</button>
-        </div>
-
-        <div id="lap-admin-panel" style="display:none;">
-          <div class="lap-stat-grid" id="lap-stat-grid"></div>
-
-          <div class="search-panel">
-            <div class="filter-row">
-              <input type="text" id="lap-admin-search" placeholder="Cari nama pelapor atau judul…" style="flex:1;min-width:220px;background:var(--navy-950);border:1px solid var(--line);color:var(--text);padding:11px 14px;font-family:var(--body);font-size:13px;border-radius:var(--radius);">
-              <select id="lap-admin-filter-kategori"><option value="">Semua Kategori</option></select>
-              <select id="lap-admin-filter-status">
-                <option value="">Semua Status</option>
-                <option value="Menunggu Verifikasi">Menunggu Verifikasi</option>
-                <option value="Sedang Diproses">Sedang Diproses</option>
-                <option value="Diteruskan ke Instansi Terkait">Diteruskan ke Instansi Terkait</option>
-                <option value="Selesai">Selesai</option>
-                <option value="Ditolak">Ditolak</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="result-count" id="lap-admin-count"></div>
-          <div class="lap-admin-table">
-            <div class="lap-admin-row head"><div>ID</div><div>Laporan</div><div>Kategori</div><div>Tanggal</div><div>Status</div></div>
-            <div id="lap-admin-rows"></div>
-          </div>
+          <h3 style="font-family:var(--display);font-size:18px;">Panel Admin Resmi</h3>
+          <p style="font-size:12.5px;color:var(--text-dim);">Pengelolaan laporan aspirasi &amp; pelaporan masyarakat kini dilakukan melalui Panel Admin resmi Saka Dirgantara Bali dengan autentikasi sungguhan, bukan lagi kode akses demo di halaman publik ini.</p>
+          <a href="<?php echo e(route('admin.login')); ?>" class="btn gold" style="width:100%;display:inline-block;text-align:center;box-sizing:border-box;">Masuk ke Panel Admin</a>
         </div>
       </div>
 
@@ -578,11 +554,15 @@
           <form class="jform" id="join-form-el">
             <div>
               <label>Nama Lengkap</label>
-              <input type="text" required placeholder="Nama sesuai identitas">
+              <input type="text" id="join-nama" required placeholder="Nama sesuai identitas">
+            </div>
+            <div>
+              <label>Email</label>
+              <input type="email" id="join-email" required placeholder="nama@email.com">
             </div>
             <div>
               <label>Asal Sekolah / Gugus Depan</label>
-              <input type="text" required placeholder="Contoh: SMAN 1 Denpasar">
+              <input type="text" id="join-sekolah" required placeholder="Contoh: SMAN 1 Denpasar">
             </div>
             <div>
               <label>Pangkalan Tujuan</label>
@@ -594,14 +574,16 @@
             </div>
             <div>
               <label>Nomor WhatsApp</label>
-              <input type="tel" required placeholder="08xxxxxxxxxx">
+              <input type="tel" id="join-wa" required placeholder="08xxxxxxxxxx">
             </div>
             <button type="submit" class="btn gold" style="margin-top:6px;">Kirim Pendaftaran</button>
           </form>
           <div class="join-success" id="join-success">
             <div class="check-big">✓</div>
             <p style="text-align:center;color:var(--text);font-family:var(--display);font-size:15px;margin-bottom:6px;">Pendaftaran Terkirim!</p>
-            <p style="text-align:center;">Pengurus pangkalan akan menghubungi kamu melalui WhatsApp untuk proses selanjutnya. Selamat datang calon anggota Saka Dirgantara!</p>
+            <div class="lap-id" id="join-success-kode" style="margin:0 auto 12px;"></div>
+            <p style="text-align:center;" id="join-success-text">Pengurus pangkalan akan menghubungi kamu melalui WhatsApp untuk proses selanjutnya. Selamat datang calon anggota Saka Dirgantara!</p>
+            <div style="text-align:center;"><button class="btn ghost" onclick="joinResetForm()" style="margin-top:6px;">Daftar Lagi</button></div>
           </div>
         </div>
       </div>
@@ -804,21 +786,10 @@ const LAP_KATEGORI = [
    icon:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 11.5a8.5 8.5 0 1 1-3.4-6.8"/><path d="M21 4v6h-6"/></svg>`},
 ];
 
-const LAP_STATUS_LIST = ["Menunggu Verifikasi","Sedang Diproses","Diteruskan ke Instansi Terkait","Selesai","Ditolak"];
 function lapStatusClass(s){
   return {"Menunggu Verifikasi":"menunggu","Sedang Diproses":"diproses","Diteruskan ke Instansi Terkait":"diteruskan","Selesai":"selesai","Ditolak":"ditolak"}[s] || "menunggu";
 }
-let lapCounter = 4;
-let LAP_REPORTS = [
-  {id:"LAP-2026-0001", kategori:"Keselamatan Penerbangan", judul:"Layang-layang di dekat jalur pendaratan", nama:"Made Suarjana", email:"made.s@contoh.org", kota:"Badung", tanggal:"2026-07-10", status:"Diteruskan ke Instansi Terkait", rahasia:"Publik",
-   log:[["Laporan diterima","10 Jul 2026"],["Diverifikasi Admin","11 Jul 2026"],["Diteruskan ke AirNav Indonesia","13 Jul 2026"]]},
-  {id:"LAP-2026-0002", kategori:"Permohonan Edukasi", judul:"Sosialisasi kedirgantaraan untuk SMP di Gianyar", nama:"SMP Negeri 2 Gianyar", email:"smpn2gia@contoh.sch.id", kota:"Gianyar", tanggal:"2026-07-15", status:"Sedang Diproses", rahasia:"Publik",
-   log:[["Laporan diterima","15 Jul 2026"],["Diverifikasi Admin","16 Jul 2026"],["Dijadwalkan bersama Pamong Saka","18 Jul 2026"]]},
-  {id:"LAP-2026-0003", kategori:"Lingkungan dan Fasilitas", judul:"Tenda latihan rusak di Pangkalan Tabanan", nama:"Anonim", email:"anonim@contoh.org", kota:"Tabanan", tanggal:"2026-07-18", status:"Menunggu Verifikasi", rahasia:"Anonim",
-   log:[["Laporan diterima","18 Jul 2026"]]},
-  {id:"LAP-2026-0004", kategori:"Kritik dan Saran", judul:"Usulan penambahan jadwal latihan aeromodelling", nama:"Ni Kadek Ratih", email:"ratih@contoh.org", kota:"Denpasar", tanggal:"2026-07-05", status:"Selesai", rahasia:"Publik",
-   log:[["Laporan diterima","5 Jul 2026"],["Diverifikasi Admin","6 Jul 2026"],["Ditindaklanjuti Dewan Saka","9 Jul 2026"],["Selesai ditindaklanjuti","12 Jul 2026"]]},
-];
+const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]')?.content || "";
 
 /* ================= NAV ================= */
 function goPage(id){
@@ -1008,15 +979,63 @@ renderMembers();
 
 /* ================= AYO GABUNG (FORM) ================= */
 const joinPangkalanSel = document.getElementById("join-pangkalan");
-PANGKALAN.forEach(p=>joinPangkalanSel.insertAdjacentHTML("beforeend", `<option value="${p.nama}">${p.nama} (${p.kota})</option>`));
+joinPangkalanSel.insertAdjacentHTML("beforeend", `<option value="">Belum ditentukan</option>`);
+PANGKALAN.forEach(p=>joinPangkalanSel.insertAdjacentHTML("beforeend", `<option value="${p.id}">${p.nama} (${p.kota})</option>`));
 const joinKridaSel = document.getElementById("join-krida");
 KRIDA_NAMES.forEach(k=>joinKridaSel.insertAdjacentHTML("beforeend", `<option value="${k}">${k}</option>`));
 
 document.getElementById("join-form-el").addEventListener("submit", function(e){
   e.preventDefault();
-  this.style.display = "none";
-  document.getElementById("join-success").classList.add("show");
+  const btn = this.querySelector("button[type=submit]");
+  const originalLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "Mengirim...";
+
+  const payload = {
+    nama: document.getElementById("join-nama").value.trim(),
+    email: document.getElementById("join-email").value.trim(),
+    asal_sekolah: document.getElementById("join-sekolah").value.trim(),
+    pangkalan_id: joinPangkalanSel.value || null,
+    krida: joinKridaSel.value,
+    no_hp: document.getElementById("join-wa").value.trim(),
+  };
+
+  fetch("<?php echo e(route('pendaftaran.store')); ?>", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "X-CSRF-TOKEN": CSRF_TOKEN,
+    },
+    body: JSON.stringify(payload),
+  })
+  .then(async res => {
+    const data = await res.json();
+    if(!res.ok){ throw data; }
+    return data;
+  })
+  .then(data => {
+    this.style.display = "none";
+    document.getElementById("join-success-kode").textContent = data.kode_pendaftaran;
+    document.getElementById("join-success-text").textContent =
+      "Pengurus pangkalan akan menghubungi kamu melalui WhatsApp untuk proses selanjutnya. Konfirmasi beserta kode pendaftaran ini juga telah dikirim ke email kamu.";
+    document.getElementById("join-success").classList.add("show");
+  })
+  .catch(err => {
+    const firstError = err?.errors ? Object.values(err.errors)[0][0] : (err?.message || "Terjadi kesalahan, silakan coba lagi.");
+    lapToast(firstError);
+  })
+  .finally(() => {
+    btn.disabled = false;
+    btn.textContent = originalLabel;
+  });
 });
+
+function joinResetForm(){
+  document.getElementById("join-form-el").reset();
+  document.getElementById("join-form-el").style.display = "grid";
+  document.getElementById("join-success").classList.remove("show");
+}
 
 /* ================= LAYANAN ASPIRASI & PELAPORAN ================= */
 
@@ -1069,28 +1088,53 @@ function lapToast(msg){
 /* submit form */
 document.getElementById("lap-form").addEventListener("submit", function(e){
   e.preventDefault();
-  lapCounter++;
+  const btn = this.querySelector("button[type=submit]");
+  const originalLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "Mengirim...";
+
   const rahasia = document.querySelector('input[name="lap-rahasia"]:checked').value;
-  const namaInput = document.getElementById("lap-nama").value.trim();
-  const id = "LAP-2026-" + String(lapCounter).padStart(4,"0");
-  const report = {
-    id,
-    kategori: lapKategoriSel.value,
-    judul: document.getElementById("lap-judul").value.trim(),
-    nama: rahasia==="Anonim" ? "Anonim" : namaInput,
-    email: document.getElementById("lap-email").value.trim(),
-    kota: document.getElementById("lap-kota").value.trim(),
-    tanggal: document.getElementById("lap-tanggal").value || "2026-07-23",
-    status: "Menunggu Verifikasi",
-    rahasia,
-    log: [["Laporan diterima", "23 Jul 2026"]]
-  };
-  LAP_REPORTS.unshift(report);
-  document.getElementById("lap-form").style.display = "none";
-  document.getElementById("lap-success").classList.add("show");
-  document.getElementById("lap-success-id").textContent = id;
-  lapToast("Laporan berhasil dikirim");
-  renderLapAdmin();
+  const fd = new FormData();
+  fd.append("nama", document.getElementById("lap-nama").value.trim());
+  fd.append("email", document.getElementById("lap-email").value.trim());
+  fd.append("no_hp", document.getElementById("lap-wa").value.trim());
+  fd.append("instansi", document.getElementById("lap-instansi").value.trim());
+  fd.append("kota", document.getElementById("lap-kota").value.trim());
+  fd.append("kategori", lapKategoriSel.value);
+  fd.append("judul", document.getElementById("lap-judul").value.trim());
+  fd.append("deskripsi", document.getElementById("lap-deskripsi").value.trim());
+  fd.append("lokasi_kejadian", document.getElementById("lap-lokasi").value.trim());
+  fd.append("tanggal_kejadian", document.getElementById("lap-tanggal").value);
+  fd.append("jam_kejadian", document.getElementById("lap-jam").value);
+  fd.append("kerahasiaan", rahasia);
+  fd.append("consent", document.getElementById("lap-consent").checked ? "1" : "0");
+  const files = document.getElementById("lap-file").files;
+  for(let i=0;i<files.length;i++){ fd.append("lampiran[]", files[i]); }
+
+  fetch("<?php echo e(route('aspirasi.store')); ?>", {
+    method: "POST",
+    headers: { "Accept": "application/json", "X-CSRF-TOKEN": CSRF_TOKEN },
+    body: fd,
+  })
+  .then(async res => {
+    const data = await res.json();
+    if(!res.ok){ throw data; }
+    return data;
+  })
+  .then(data => {
+    document.getElementById("lap-form").style.display = "none";
+    document.getElementById("lap-success").classList.add("show");
+    document.getElementById("lap-success-id").textContent = data.nomor_tiket;
+    lapToast("Laporan berhasil dikirim");
+  })
+  .catch(err => {
+    const firstError = err?.errors ? Object.values(err.errors)[0][0] : (err?.message || "Terjadi kesalahan, silakan coba lagi.");
+    lapToast(firstError);
+  })
+  .finally(() => {
+    btn.disabled = false;
+    btn.textContent = originalLabel;
+  });
 });
 
 function lapResetForm(){
@@ -1102,104 +1146,41 @@ function lapResetForm(){
 
 /* cek status */
 function lapCheckStatus(){
-  const q = document.getElementById("lap-check-input").value.trim().toLowerCase();
+  const q = document.getElementById("lap-check-input").value.trim();
   const box = document.getElementById("lap-check-result");
   if(!q){ box.innerHTML = ""; return; }
-  const found = LAP_REPORTS.find(r => r.id.toLowerCase()===q || r.email.toLowerCase()===q);
-  if(!found){
+  box.innerHTML = `<div class="lap-not-found">Mencari data laporan…</div>`;
+
+  fetch(`<?php echo e(route('aspirasi.check')); ?>?query=${encodeURIComponent(q)}`, {
+    headers: { "Accept": "application/json" },
+  })
+  .then(async res => {
+    const data = await res.json();
+    if(!res.ok){ throw data; }
+    return data;
+  })
+  .then(data => {
+    box.innerHTML = data.data.map(found => `
+      <div class="lap-result-card">
+        <div class="lap-result-head">
+          <h4>${found.judul}</h4>
+          <span class="status-pill ${lapStatusClass(found.status)}">${found.status}</span>
+        </div>
+        <div class="lap-result-meta">${found.nomor_tiket} · ${found.kategori} · ${found.kota} · Diajukan ${found.tanggal}</div>
+        <div class="lap-timeline">
+          ${found.riwayat.map((l,i)=>`
+            <div class="lap-tl-item done">
+              <div class="lap-tl-dot"></div>
+              <div class="lap-tl-body"><b>${l.catatan}</b><span>${l.tanggal}</span></div>
+            </div>`).join("")}
+        </div>
+      </div>`).join("");
+  })
+  .catch(err => {
     box.innerHTML = `<div class="lap-not-found">Data laporan dengan tiket/email "${q}" tidak ditemukan. Periksa kembali nomor tiket atau email yang digunakan saat mengajukan laporan.</div>`;
-    return;
-  }
-  box.innerHTML = `
-    <div class="lap-result-card">
-      <div class="lap-result-head">
-        <h4>${found.judul}</h4>
-        <span class="status-pill ${lapStatusClass(found.status)}">${found.status}</span>
-      </div>
-      <div class="lap-result-meta">${found.id} · ${found.kategori} · ${found.kota} · Diajukan ${found.tanggal}</div>
-      <div class="lap-timeline">
-        ${found.log.map((l,i)=>`
-          <div class="lap-tl-item ${i<found.log.length ? 'done':''}">
-            <div class="lap-tl-dot"></div>
-            <div class="lap-tl-body"><b>${l[0]}</b><span>${l[1]}</span></div>
-          </div>`).join("")}
-      </div>
-    </div>`;
+  });
 }
 document.getElementById("lap-check-input").addEventListener("keydown", e=>{ if(e.key==="Enter") lapCheckStatus(); });
-
-/* admin */
-function lapAdminLogin(){
-  const pass = document.getElementById("lap-admin-pass").value;
-  if(pass === "admin"){
-    document.getElementById("lap-admin-gate").style.display = "none";
-    document.getElementById("lap-admin-panel").style.display = "block";
-    renderLapAdmin();
-  } else {
-    lapToast("Kode akses salah (demo: admin)");
-  }
-}
-
-const lapAdminFilterKategori = document.getElementById("lap-admin-filter-kategori");
-LAP_KATEGORI.forEach(c=>lapAdminFilterKategori.insertAdjacentHTML("beforeend", `<option value="${c.key}">${c.key}</option>`));
-
-function renderLapAdmin(){
-  const statGrid = document.getElementById("lap-stat-grid");
-  const total = LAP_REPORTS.length;
-  const menunggu = LAP_REPORTS.filter(r=>r.status==="Menunggu Verifikasi").length;
-  const diproses = LAP_REPORTS.filter(r=>r.status==="Sedang Diproses" || r.status==="Diteruskan ke Instansi Terkait").length;
-  const selesai = LAP_REPORTS.filter(r=>r.status==="Selesai").length;
-  const ditolak = LAP_REPORTS.filter(r=>r.status==="Ditolak").length;
-  statGrid.innerHTML = `
-    <div class="lap-stat"><b>${total}</b><span>Total Laporan</span></div>
-    <div class="lap-stat"><b>${menunggu}</b><span>Menunggu</span></div>
-    <div class="lap-stat"><b>${diproses}</b><span>Diproses</span></div>
-    <div class="lap-stat"><b>${selesai}</b><span>Selesai</span></div>
-    <div class="lap-stat"><b>${ditolak}</b><span>Ditolak</span></div>`;
-
-  const q = (document.getElementById("lap-admin-search")?.value || "").trim().toLowerCase();
-  const fKat = document.getElementById("lap-admin-filter-kategori")?.value || "";
-  const fStat = document.getElementById("lap-admin-filter-status")?.value || "";
-
-  const results = LAP_REPORTS.filter(r=>{
-    if(fKat && r.kategori!==fKat) return false;
-    if(fStat && r.status!==fStat) return false;
-    if(q && !(r.nama.toLowerCase().includes(q) || r.judul.toLowerCase().includes(q))) return false;
-    return true;
-  });
-
-  document.getElementById("lap-admin-count").textContent = `${results.length} dari ${total} laporan`;
-  document.getElementById("lap-admin-rows").innerHTML = results.map(r=>`
-    <div class="lap-admin-row">
-      <div class="lid">${r.id}</div>
-      <div class="ljudul"><b>${r.judul}</b><span>${r.nama} · ${r.kota}</span></div>
-      <div>${r.kategori}</div>
-      <div>${r.tanggal}</div>
-      <div>
-        <select onchange="lapChangeStatus('${r.id}', this.value)">
-          ${LAP_STATUS_LIST.map(s=>`<option value="${s}" ${s===r.status?'selected':''}>${s}</option>`).join("")}
-        </select>
-      </div>
-    </div>`).join("");
-}
-
-function lapChangeStatus(id, newStatus){
-  const r = LAP_REPORTS.find(x=>x.id===id);
-  if(!r) return;
-  r.status = newStatus;
-  r.log.push([newStatus + " (diperbarui admin)", "23 Jul 2026"]);
-  lapToast(`Status ${id} diperbarui menjadi "${newStatus}"`);
-  renderLapAdmin();
-}
-
-["lap-admin-search"].forEach(id=>{
-  const el = document.getElementById(id);
-  if(el) el.addEventListener("input", renderLapAdmin);
-});
-["lap-admin-filter-kategori","lap-admin-filter-status"].forEach(id=>{
-  const el = document.getElementById(id);
-  if(el) el.addEventListener("change", renderLapAdmin);
-});
 
 /* ================= PETA ================= */
 function initMap(){

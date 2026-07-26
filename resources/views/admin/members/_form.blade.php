@@ -134,13 +134,15 @@
             <div>
                 <label for="angkatan" class="block text-sm font-medium text-slate-700 mb-1">Angkatan</label>
                 @php $angkatan = old('angkatan', $member->angkatan ?? ''); @endphp
-                <select id="angkatan" name="angkatan"
-                        class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-sky-500 focus:ring-sky-500 @error('angkatan') border-red-400 @enderror">
-                    <option value="">Belum ditentukan</option>
+                <input type="text" id="angkatan" name="angkatan" list="angkatan-suggestions" value="{{ $angkatan }}"
+                       placeholder="Contoh: Angkatan XXIII (2027)"
+                       class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-sky-500 focus:ring-sky-500 @error('angkatan') border-red-400 @enderror">
+                <datalist id="angkatan-suggestions">
                     @foreach (\App\Models\Member::ANGKATAN_OPTIONS as $opt)
-                        <option value="{{ $opt }}" @selected($angkatan === $opt)>{{ $opt }}</option>
+                        <option value="{{ $opt }}"></option>
                     @endforeach
-                </select>
+                </datalist>
+                <p class="mt-1 text-xs text-slate-400">Bebas diisi/diedit — ketik angkatan baru jika belum ada di saran.</p>
                 @error('angkatan') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
             </div>
 
