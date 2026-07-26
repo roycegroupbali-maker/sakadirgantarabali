@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreAspirationRequest;
 use App\Mail\AspirationConfirmationMail;
+use App\Mail\NewAspirationNotificationMail;
+use App\Models\Admin;
 use App\Models\Aspiration;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -37,6 +39,16 @@ class AspirationController extends Controller
             Mail::to($aspiration->email)->send(new AspirationConfirmationMail($aspiration));
         } catch (\Throwable $e) {
             Log::warning('Gagal mengirim email konfirmasi laporan aspirasi: '.$e->getMessage());
+        }
+
+        try {
+            $adminEmails = Admin::query()->pluck('email')->filter()->all();
+
+            if (! empty($adminEmails)) {
+                Mail::to($adminEmails)->send(new NewAspirationNotificationMail($aspiration));
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Gagal mengirim email notifikasi laporan aspirasi ke admin: '.$e->getMessage());
         }
 
         return response()->json([

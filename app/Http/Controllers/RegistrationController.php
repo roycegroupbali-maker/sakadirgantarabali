@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreRegistrationRequest;
+use App\Mail\NewRegistrationNotificationMail;
 use App\Mail\RegistrationConfirmationMail;
+use App\Models\Admin;
 use App\Models\Registration;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
@@ -24,6 +26,16 @@ class RegistrationController extends Controller
             Mail::to($registration->email)->send(new RegistrationConfirmationMail($registration));
         } catch (\Throwable $e) {
             Log::warning('Gagal mengirim email konfirmasi pendaftaran: '.$e->getMessage());
+        }
+
+        try {
+            $adminEmails = Admin::query()->pluck('email')->filter()->all();
+
+            if (! empty($adminEmails)) {
+                Mail::to($adminEmails)->send(new NewRegistrationNotificationMail($registration));
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Gagal mengirim email notifikasi pendaftaran ke admin: '.$e->getMessage());
         }
 
         return response()->json([
