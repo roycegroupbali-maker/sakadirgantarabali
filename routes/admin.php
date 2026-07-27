@@ -36,11 +36,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::resource('news', DirgaNewsController::class)->except(['show']);
         Route::resource('gallery', GalleryController::class)->except(['show']);
+        Route::get('members/pdf', [MemberController::class, 'exportPdf'])->name('members.pdf');
         Route::resource('members', MemberController::class)->except(['show']);
         Route::resource('pangkalan', PangkalanController::class)->except(['show']);
 
         // Kelola formulir Pendaftaran Anggota Baru yang masuk dari halaman publik.
         Route::get('pendaftaran', [AdminRegistrationController::class, 'index'])->name('pendaftaran.index');
+        Route::get('pendaftaran/pdf', [AdminRegistrationController::class, 'exportPdf'])->name('pendaftaran.pdf');
         Route::patch('pendaftaran/{pendaftaran}', [AdminRegistrationController::class, 'update'])->name('pendaftaran.update');
         Route::delete('pendaftaran/{pendaftaran}', [AdminRegistrationController::class, 'destroy'])->name('pendaftaran.destroy');
 

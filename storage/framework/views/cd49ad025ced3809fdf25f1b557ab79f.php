@@ -37,6 +37,12 @@
             </select>
             <button type="submit" class="rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 px-3 py-2 text-sm">Cari</button>
         </form>
+
+        <a href="<?php echo e(route('admin.pendaftaran.pdf', request()->only(['q', 'status']))); ?>"
+           class="inline-flex items-center justify-center gap-2 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-sm font-medium px-4 py-2 transition">
+            <?php echo $__env->make('admin.components.icon', ['name' => 'download'], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+            Unduh PDF
+        </a>
     </div>
 
     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
