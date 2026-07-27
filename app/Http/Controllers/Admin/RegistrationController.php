@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdateRegistrationRequest;
+use App\Mail\RegistrationStatusUpdatedMail;
 use App\Models\Registration;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 
 class RegistrationController extends Controller
@@ -38,7 +41,19 @@ class RegistrationController extends Controller
 
     public function update(UpdateRegistrationRequest $request, Registration $pendaftaran): RedirectResponse
     {
+        $statusSebelumnya = $pendaftaran->status;
+
         $pendaftaran->update($request->validated());
+
+        if ($pendaftaran->status !== $statusSebelumnya) {
+            try {
+                Mail::to($pendaftaran->email)->send(
+                    new RegistrationStatusUpdatedMail($pendaftaran, $statusSebelumnya)
+                );
+            } catch (\Throwable $e) {
+                Log::warning('Gagal mengirim email update status pendaftaran: '.$e->getMessage());
+            }
+        }
 
         return redirect()->route('admin.pendaftaran.index')
             ->with('success', 'Status pendaftaran '.$pendaftaran->kode_pendaftaran.' berhasil diperbarui.');

@@ -1,93 +1,86 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\StoreAspirationRequest;
-use App\Mail\AspirationConfirmationMail;
-use App\Mail\NewAspirationNotificationMail;
-use App\Models\Admin;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\UpdateAspirationRequest;
+use App\Mail\AspirationStatusUpdatedMail;
 use App\Models\Aspiration;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\View\View;
 
 class AspirationController extends Controller
 {
-    public function store(StoreAspirationRequest $request): JsonResponse
+    public function index(Request $request): View
     {
-        $data = $request->validated();
-        unset($data['lampiran'], $data['consent']);
+        $aspirationList = Aspiration::query()
+            ->when($request->filled('q'), function ($query) use ($request) {
+                $query->where('nama', 'like', '%'.$request->input('q').'%')
+                    ->orWhere('judul', 'like', '%'.$request->input('q').'%')
+                    ->orWhere('nomor_tiket', 'like', '%'.$request->input('q').'%');
+            })
+            ->when($request->filled('kategori'), fn ($query) => $query->where('kategori', $request->input('kategori')))
+            ->when($request->filled('status'), fn ($query) => $query->where('status', $request->input('status')))
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
 
-        $data['nomor_tiket'] = Aspiration::generateNomorTiket();
-        $data['status'] = 'Menunggu Verifikasi';
-        $data['riwayat'] = [[
-            'catatan' => 'Laporan diterima',
-            'tanggal' => now()->translatedFormat('d M Y, H:i'),
-        ]];
+        $stats = [
+            'total' => Aspiration::count(),
+            'menunggu' => Aspiration::where('status', 'Menunggu Verifikasi')->count(),
+            'diproses' => Aspiration::whereIn('status', ['Sedang Diproses', 'Diteruskan ke Instansi Terkait'])->count(),
+            'selesai' => Aspiration::where('status', 'Selesai')->count(),
+            'ditolak' => Aspiration::where('status', 'Ditolak')->count(),
+        ];
 
-        if ($request->hasFile('lampiran')) {
-            $data['lampiran'] = collect($request->file('lampiran'))
-                ->map(fn ($file) => $file->store('aspirasi', 'public'))
-                ->values()
-                ->all();
-        }
+        $kategoriList = Aspiration::query()->distinct()->pluck('kategori');
 
-        $aspiration = Aspiration::create($data);
-
-        try {
-            Mail::to($aspiration->email)->send(new AspirationConfirmationMail($aspiration));
-        } catch (\Throwable $e) {
-            Log::warning('Gagal mengirim email konfirmasi laporan aspirasi: '.$e->getMessage());
-        }
-
-        try {
-            $adminEmails = Admin::query()->pluck('email')->filter()->all();
-
-            if (! empty($adminEmails)) {
-                Mail::to($adminEmails)->send(new NewAspirationNotificationMail($aspiration));
-            }
-        } catch (\Throwable $e) {
-            Log::warning('Gagal mengirim email notifikasi laporan aspirasi ke admin: '.$e->getMessage());
-        }
-
-        return response()->json([
-            'message' => 'Laporan berhasil dikirim.',
-            'nomor_tiket' => $aspiration->nomor_tiket,
-        ], 201);
+        return view('admin.aspirasi.index', compact('aspirationList', 'stats', 'kategoriList'));
     }
 
-    /**
-     * Cek status laporan berdasarkan nomor tiket atau email pelapor (publik).
-     */
-    public function check(Request $request): JsonResponse
+    public function show(Aspiration $aspirasi): View
     {
-        $query = trim((string) $request->query('query', ''));
+        return view('admin.aspirasi.show', ['aspiration' => $aspirasi]);
+    }
 
-        if ($query === '') {
-            return response()->json(['message' => 'Nomor tiket atau email wajib diisi.'], 422);
+    public function update(UpdateAspirationRequest $request, Aspiration $aspirasi): RedirectResponse
+    {
+        $data = $request->validated();
+        $statusSebelumnya = $aspirasi->status;
+        $statusBerubah = $data['status'] !== $aspirasi->status;
+
+        if ($statusBerubah) {
+            $aspirasi->tambahRiwayat(
+                $data['status'].(filled($data['catatan'] ?? null) ? ' — '.$data['catatan'] : '').' (diperbarui admin)'
+            );
+        } elseif (filled($data['catatan'] ?? null)) {
+            $aspirasi->tambahRiwayat($data['catatan']);
         }
 
-        $aspirations = Aspiration::query()
-            ->where('nomor_tiket', $query)
-            ->orWhere('email', $query)
-            ->latest()
-            ->get();
+        $aspirasi->status = $data['status'];
+        $aspirasi->save();
 
-        if ($aspirations->isEmpty()) {
-            return response()->json(['message' => 'Data laporan tidak ditemukan.'], 404);
+        if ($statusBerubah) {
+            try {
+                Mail::to($aspirasi->email)->send(
+                    new AspirationStatusUpdatedMail($aspirasi, $statusSebelumnya, $data['catatan'] ?? null)
+                );
+            } catch (\Throwable $e) {
+                Log::warning('Gagal mengirim email update status laporan aspirasi: '.$e->getMessage());
+            }
         }
 
-        $result = $aspirations->map(fn (Aspiration $a) => [
-            'nomor_tiket' => $a->nomor_tiket,
-            'judul' => $a->judul,
-            'kategori' => $a->kategori,
-            'kota' => $a->kota,
-            'status' => $a->status,
-            'tanggal' => $a->created_at->translatedFormat('d M Y'),
-            'riwayat' => $a->riwayat ?? [],
-        ])->values();
+        return redirect()->route('admin.aspirasi.show', $aspirasi)
+            ->with('success', 'Status laporan '.$aspirasi->nomor_tiket.' berhasil diperbarui.');
+    }
 
-        return response()->json(['data' => $result]);
+    public function destroy(Aspiration $aspirasi): RedirectResponse
+    {
+        $aspirasi->delete();
+
+        return redirect()->route('admin.aspirasi.index')->with('success', 'Data laporan berhasil dihapus.');
     }
 }

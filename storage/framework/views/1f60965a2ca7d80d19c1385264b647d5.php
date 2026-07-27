@@ -1000,7 +1000,7 @@ document.getElementById("join-form-el").addEventListener("submit", function(e){
     no_hp: document.getElementById("join-wa").value.trim(),
   };
 
-  fetch("<?php echo e(route('pendaftaran.store')); ?>", {
+  fetch("<?php echo e(route('pendaftaran.store', [], false)); ?>", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -1022,7 +1022,9 @@ document.getElementById("join-form-el").addEventListener("submit", function(e){
     document.getElementById("join-success").classList.add("show");
   })
   .catch(err => {
-    const firstError = err?.errors ? Object.values(err.errors)[0][0] : (err?.message || "Terjadi kesalahan, silakan coba lagi.");
+    const firstError = err?.errors
+      ? Object.values(err.errors)[0][0]
+      : (err?.message && !(err instanceof TypeError) ? err.message : "Terjadi kesalahan, silakan coba lagi.");
     lapToast(firstError);
   })
   .finally(() => {
@@ -1111,7 +1113,7 @@ document.getElementById("lap-form").addEventListener("submit", function(e){
   const files = document.getElementById("lap-file").files;
   for(let i=0;i<files.length;i++){ fd.append("lampiran[]", files[i]); }
 
-  fetch("<?php echo e(route('aspirasi.store')); ?>", {
+  fetch("<?php echo e(route('aspirasi.store', [], false)); ?>", {
     method: "POST",
     headers: { "Accept": "application/json", "X-CSRF-TOKEN": CSRF_TOKEN },
     body: fd,
@@ -1128,7 +1130,9 @@ document.getElementById("lap-form").addEventListener("submit", function(e){
     lapToast("Laporan berhasil dikirim");
   })
   .catch(err => {
-    const firstError = err?.errors ? Object.values(err.errors)[0][0] : (err?.message || "Terjadi kesalahan, silakan coba lagi.");
+    const firstError = err?.errors
+      ? Object.values(err.errors)[0][0]
+      : (err?.message && !(err instanceof TypeError) ? err.message : "Terjadi kesalahan, silakan coba lagi.");
     lapToast(firstError);
   })
   .finally(() => {
@@ -1151,7 +1155,7 @@ function lapCheckStatus(){
   if(!q){ box.innerHTML = ""; return; }
   box.innerHTML = `<div class="lap-not-found">Mencari data laporan…</div>`;
 
-  fetch(`<?php echo e(route('aspirasi.check')); ?>?query=${encodeURIComponent(q)}`, {
+  fetch(`<?php echo e(route('aspirasi.check', [], false)); ?>?query=${encodeURIComponent(q)}`, {
     headers: { "Accept": "application/json" },
   })
   .then(async res => {
