@@ -1,0 +1,138 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600&display=swap');
+
+/* ==========================================================================
+   ACCESSIBILITY TOOLS â€” tombol melayang + panel alat bantu disabilitas
+   Disesuaikan dengan tema navy/gold situs Saka Dirgantara
+   ========================================================================== */
+
+.a11y-toggle{
+  position:fixed; bottom:26px; right:26px; z-index:121;
+  width:50px; height:50px; border-radius:50%;
+  background:var(--navy-900); color:var(--text);
+  display:flex; align-items:center; justify-content:center;
+  border:2px solid var(--gold);
+  box-shadow:0 10px 26px rgba(0,0,0,.45);
+  transition:transform .2s ease, box-shadow .2s ease;
+}
+.a11y-toggle:hover{ transform:translateY(-2px); box-shadow:0 14px 30px rgba(0,0,0,.55); }
+.a11y-toggle.active{ background:var(--gold); color:var(--navy-950); }
+
+.a11y-overlay{
+  position:fixed; inset:0; background:rgba(7,15,34,.6);
+  opacity:0; pointer-events:none; z-index:130; transition:opacity .25s ease;
+}
+.a11y-overlay.open{ opacity:1; pointer-events:auto; }
+
+.a11y-panel{
+  position:fixed; top:0; right:0; height:100vh; width:340px; max-width:88vw;
+  background:var(--navy-950); z-index:131; border-left:1px solid var(--line);
+  box-shadow:-8px 0 30px rgba(0,0,0,.5);
+  display:flex; flex-direction:column;
+  transform:translateX(100%); transition:transform .28s ease;
+}
+.a11y-panel.open{ transform:translateX(0); }
+
+.a11y-panel-head{
+  background:var(--navy-900); color:var(--text); border-bottom:1px solid var(--line);
+  padding:20px 22px; display:flex; align-items:center; justify-content:space-between;
+  flex-shrink:0;
+}
+.a11y-panel-head h2{ font-family:var(--display); font-size:18px; font-weight:600; letter-spacing:.01em; }
+.a11y-close{
+  background:none; border:1px solid var(--line); color:var(--text); font-size:16px; line-height:1;
+  width:32px; height:32px; border-radius:var(--radius); display:flex; align-items:center; justify-content:center;
+  transition:border-color .2s ease, color .2s ease;
+}
+.a11y-close:hover{ border-color:var(--gold); color:var(--gold); }
+
+.a11y-panel-body{
+  flex:1; overflow-y:auto; padding:22px;
+}
+.a11y-panel-body::-webkit-scrollbar{ width:6px; }
+.a11y-panel-body::-webkit-scrollbar-thumb{ background:var(--line); border-radius:3px; }
+
+.a11y-group{ margin-bottom:24px; }
+.a11y-group h3{
+  font-family:var(--mono); font-size:11.5px; font-weight:600; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--gold); margin-bottom:10px;
+}
+
+.a11y-row{ display:grid; gap:10px; }
+.a11y-row-1{ grid-template-columns:1fr; }
+.a11y-row-2{ grid-template-columns:1fr 1fr; }
+.a11y-row-3{ grid-template-columns:1fr 1fr 1fr; }
+.a11y-row-4{ grid-template-columns:1fr 1fr; }
+
+.a11y-btn{
+  border:1px solid var(--line); background:var(--navy-800);
+  border-radius:var(--radius); padding:14px 8px;
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+  font-family:var(--body); font-size:12.5px; font-weight:600; color:var(--text-muted);
+  transition:border-color .15s ease, background .15s ease, color .15s ease;
+}
+.a11y-btn:hover{ border-color:var(--gold); color:var(--text); }
+.a11y-btn.active{
+  background:var(--gold); border-color:var(--gold); color:var(--navy-950);
+}
+.a11y-icon{ font-size:18px; line-height:1; }
+.a11y-icon-font{ font-family:var(--display); font-size:16px; }
+
+.a11y-panel-foot{
+  flex-shrink:0; padding:16px 22px 22px; border-top:1px solid var(--line);
+}
+.a11y-reset{
+  width:100%; background:var(--danger); color:#fff; border:none; border-radius:var(--radius);
+  padding:13px; display:flex; align-items:center; justify-content:center; gap:8px;
+  font-weight:700; font-size:14px; transition:filter .15s ease;
+}
+.a11y-reset:hover{ filter:brightness(1.12); }
+
+.a11y-reading-mask{
+  position:fixed; left:0; width:100%; height:80px; z-index:115;
+  pointer-events:none; display:none;
+  box-shadow:0 -9999px 0 9999px rgba(7,15,34,.5), 0 9999px 0 9999px rgba(7,15,34,.5);
+  border-top:2px solid var(--gold); border-bottom:2px solid var(--gold);
+}
+.a11y-reading-mask.show{ display:block; }
+
+/* ==========================================================================
+   EFEK â€” diterapkan lewat class pada <body>
+   ========================================================================== */
+
+body{ zoom:var(--a11y-font-scale, 1); }
+
+body.a11y-align-left p, body.a11y-align-left li, body.a11y-align-left h1, body.a11y-align-left h2, body.a11y-align-left h3, body.a11y-align-left h4, body.a11y-align-left h5, body.a11y-align-left h6, body.a11y-align-left blockquote, body.a11y-align-left span{ text-align:left !important; }
+body.a11y-align-center p, body.a11y-align-center li, body.a11y-align-center h1, body.a11y-align-center h2, body.a11y-align-center h3, body.a11y-align-center h4, body.a11y-align-center h5, body.a11y-align-center h6, body.a11y-align-center blockquote, body.a11y-align-center span{ text-align:center !important; }
+body.a11y-align-right p, body.a11y-align-right li, body.a11y-align-right h1, body.a11y-align-right h2, body.a11y-align-right h3, body.a11y-align-right h4, body.a11y-align-right h5, body.a11y-align-right h6, body.a11y-align-right blockquote, body.a11y-align-right span{ text-align:right !important; }
+body.a11y-align-justify p, body.a11y-align-justify li, body.a11y-align-justify blockquote{ text-align:justify !important; }
+
+body.a11y-lineheight-tight p, body.a11y-lineheight-tight li{ line-height:1.25 !important; }
+body.a11y-lineheight-wide p, body.a11y-lineheight-wide li{ line-height:2 !important; }
+
+body.a11y-letterspacing-medium p, body.a11y-letterspacing-medium li, body.a11y-letterspacing-medium h1, body.a11y-letterspacing-medium h2, body.a11y-letterspacing-medium h3, body.a11y-letterspacing-medium h4, body.a11y-letterspacing-medium span, body.a11y-letterspacing-medium a{ letter-spacing:0.03em !important; }
+body.a11y-letterspacing-wide p, body.a11y-letterspacing-wide li, body.a11y-letterspacing-wide h1, body.a11y-letterspacing-wide h2, body.a11y-letterspacing-wide h3, body.a11y-letterspacing-wide h4, body.a11y-letterspacing-wide span, body.a11y-letterspacing-wide a{ letter-spacing:0.07em !important; }
+
+body.a11y-lowcolor{ filter:saturate(.35); }
+
+body.a11y-contrast{ filter:contrast(1.35) saturate(1.1); }
+body.a11y-lowcolor.a11y-contrast{ filter:saturate(.35) contrast(1.35); }
+
+body.a11y-dyslexia, body.a11y-dyslexia *{
+  font-family:'Lexend', 'Inter', sans-serif !important;
+  letter-spacing:0.02em !important;
+}
+
+body.a11y-adhd *{
+  animation:none !important;
+  transition:none !important;
+}
+body.a11y-adhd *:focus,
+body.a11y-adhd *:focus-visible{
+  outline:3px solid var(--gold) !important;
+  outline-offset:2px !important;
+}
+
+@media (max-width:640px){
+  .a11y-toggle{ bottom:20px; right:16px; width:46px; height:46px; }
+  .a11y-panel{ width:100vw; max-width:100vw; }
+}
