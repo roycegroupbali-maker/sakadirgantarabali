@@ -609,11 +609,11 @@
           <button class="btn gold" onclick="goPage('gabung')" style="margin-top:6px;">Ayo Gabung Sekarang</button>
         </div>
         <ul class="info-list">
-          <li><b>Sekretariat</b><span>Kantor Kwartir Daerah Gerakan Pramuka Bali, Denpasar</span></li>
-          <li><b>Pamong Saka</b><span>Kak I Wayan Sutama, S.Pd. (contoh)</span></li>
-          <li><b>Kontak</b><span>sakadirgantara.bali@contoh-email.org</span></li>
+          <li><b>Sekretariat</b><span>Markas komandon TNI AU I Gusti Ngurah Rai Bali, badung</span></li>
+          <li><b>Pamong Saka</b><span>Kak Yoni Ambarwati</span></li>
+          <li><b>Kontak</b><span>sk.dirgantara.bali@gmail.com</span></li>
           <li><b>Media Sosial</b><span>@sakadirgantarabali (contoh)</span></li>
-          <li><b>Jam Latihan</b><span>Setiap Sabtu, 14.00–17.00 WITA, di masing-masing pangkalan</span></li>
+          <li><b>Jam Latihan</b><span>Setiap Sabtu, 14.00–17.00 WITA, di mako tni au lanud i gusti ngurah rai bali<i/span></li>
         </ul>
       </div>
     </div>
@@ -665,8 +665,8 @@
         <div class="footer-col">
           <h5>Sekretariat</h5>
           <ul>
-            <li class="contact-item"><b>Alamat</b>Kantor Kwarda Gerakan Pramuka Bali, Denpasar</li>
-            <li class="contact-item"><b>Email</b>sakadirgantara.bali@contoh-email.org</li>
+            <li class="contact-item"><b>Alamat</b>Markas komandon TNI AU I Gusti Ngurah Rai Bali, badung</li>
+            <li class="contact-item"><b>Email</b>sk.dirgantara.bali@gmail.com</li>
             <li class="contact-item"><b>Latihan</b>Sabtu, 14.00–17.00 WITA</li>
           </ul>
         </div>
@@ -679,8 +679,8 @@
     <div class="wrap">
       <div class="foot-note">© 2026 Saka Dirgantara — Lanud I Gusti Ngurah Rai. Seluruh hak cipta dilindungi.</div>
       <div class="foot-legal">
-        <span>Situs contoh</span>
-        <span>Data anggota bersifat ilustratif</span>
+        <span>POWERED BY</span>
+        <span>SKYNUSA TECH</span>
         <a href="<?php echo e(url('/admin/login')); ?>" class="foot-admin-link">Login Admin</a>
       </div>
     </div>
