@@ -6,6 +6,7 @@ use App\Http\Requests\StoreRegistrationRequest;
 use App\Mail\NewRegistrationNotificationMail;
 use App\Mail\RegistrationConfirmationMail;
 use App\Models\Admin;
+use App\Models\Pangkalan;
 use App\Models\Registration;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
@@ -16,6 +17,23 @@ class RegistrationController extends Controller
     public function store(StoreRegistrationRequest $request): JsonResponse
     {
         $data = $request->validated();
+
+        // Pangkalan/asal sekolah kini satu isian bebas dari pendaftar. Cari
+        // pangkalan yang namanya sama (tanpa peduli besar/kecil huruf), atau
+        // buat baru otomatis kalau belum ada — sehingga langsung muncul juga
+        // di Panel Admin → Pangkalan tanpa perlu input manual dari admin.
+        $namaPangkalan = trim($data['pangkalan_nama']);
+
+        $pangkalan = Pangkalan::whereRaw('LOWER(nama) = ?', [mb_strtolower($namaPangkalan)])->first();
+
+        if (! $pangkalan) {
+            $pangkalan = Pangkalan::create(['nama' => $namaPangkalan]);
+        }
+
+        $data['pangkalan_id'] = $pangkalan->id;
+        $data['asal_sekolah'] = $namaPangkalan;
+        unset($data['pangkalan_nama']);
+
         $data['kode_pendaftaran'] = Registration::generateKodePendaftaran();
         $data['status'] = 'Menunggu Verifikasi';
 

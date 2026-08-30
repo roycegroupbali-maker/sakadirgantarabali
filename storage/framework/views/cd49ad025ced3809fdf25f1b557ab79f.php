@@ -53,7 +53,7 @@
                         <th class="px-4 py-3 font-medium">Kode</th>
                         <th class="px-4 py-3 font-medium">Nama</th>
                         <th class="px-4 py-3 font-medium">Kontak</th>
-                        <th class="px-4 py-3 font-medium">Pangkalan Tujuan</th>
+                        <th class="px-4 py-3 font-medium">Pangkalan/Asal Sekolah</th>
                         <th class="px-4 py-3 font-medium">Krida</th>
                         <th class="px-4 py-3 font-medium">Status</th>
                         <th class="px-4 py-3 font-medium text-right">Aksi</th>
@@ -70,13 +70,12 @@
                             <td class="px-4 py-3 font-medium text-slate-800">
                                 <?php echo e($registration->nama); ?>
 
-                                <p class="mt-1 text-xs font-normal text-slate-400"><?php echo e($registration->asal_sekolah); ?></p>
                             </td>
                             <td class="px-4 py-3 text-slate-600">
                                 <p><?php echo e($registration->email); ?></p>
                                 <p class="text-xs text-slate-400"><?php echo e($registration->no_hp); ?></p>
                             </td>
-                            <td class="px-4 py-3 text-slate-600"><?php echo e($registration->pangkalan?->nama ?? '-'); ?></td>
+                            <td class="px-4 py-3 text-slate-600"><?php echo e($registration->pangkalan?->nama ?? $registration->asal_sekolah); ?></td>
                             <td class="px-4 py-3 text-slate-600"><?php echo e($registration->krida ?? '-'); ?></td>
                             <td class="px-4 py-3">
                                 <form method="POST" action="<?php echo e(route('admin.pendaftaran.update', $registration)); ?>" class="flex flex-col gap-1">

@@ -33,13 +33,27 @@ class HomeController extends Controller
         $newsData = DirgaNews::published()
             ->orderByDesc('tanggal_publish')
             ->get()
-            ->map(fn (DirgaNews $n) => [
-                'cat' => 'Dirga News',
-                'date' => $this->formatTanggal($n->tanggal_publish),
-                'title' => $n->judul,
-                'excerpt' => Str::limit(strip_tags($n->isi), 160),
-                'content' => strip_tags($n->isi),
-            ])->values();
+            ->map(function (DirgaNews $n) {
+                $isiBersih = strip_tags($n->isi);
+                // Pecah isi berita jadi paragraf terpisah (baris kosong sebagai
+                // pemisah) supaya tampilan detail berita bisa dirender rapi
+                // per paragraf, bukan satu blok teks panjang tanpa jeda.
+                $paragraf = preg_split('/\n\s*\n/', trim($isiBersih));
+                $paragraf = array_values(array_filter(array_map('trim', $paragraf)));
+
+                return [
+                    'cat' => 'Dirga News',
+                    'date' => $this->formatTanggal($n->tanggal_publish),
+                    'title' => $n->judul,
+                    'excerpt' => Str::limit($isiBersih, 160),
+                    'content' => $paragraf,
+                    'penulis' => $n->penulis,
+                    // Thumbnail yang diunggah lewat Panel Admin. Sebelumnya field ini
+                    // tidak dikirim ke tampilan publik sehingga kartu Dirga News
+                    // selalu menampilkan ikon generik, bukan foto yang diunggah.
+                    'thumbnail' => $n->thumbnail_url,
+                ];
+            })->values();
 
         $galleryData = Gallery::orderByDesc('tanggal')
             ->get()

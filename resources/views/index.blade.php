@@ -276,12 +276,18 @@
 </div>
 
 <div class="modal-bg" id="news-modal">
-  <div class="modal">
+  <div class="modal article-modal">
     <button class="modal-close" onclick="closeModal()">✕</button>
-    <span class="news-cat" style="position:static;display:inline-block;" id="modal-cat"></span>
-    <div class="news-date" id="modal-date"></div>
-    <h2 id="modal-title"></h2>
-    <div id="modal-content"></div>
+    <div class="article-hero" id="modal-hero"></div>
+    <div class="article-body">
+      <div class="article-meta">
+        <span class="news-cat" style="position:static;display:inline-block;" id="modal-cat"></span>
+        <span class="news-date" id="modal-date"></span>
+        <span class="article-author" id="modal-author"></span>
+      </div>
+      <h2 id="modal-title"></h2>
+      <div id="modal-content" class="article-content"></div>
+    </div>
   </div>
 </div>
 
@@ -551,7 +557,7 @@
         <div class="join-panel">
           <span class="tag">Formulir Pendaftaran</span>
           <h2 style="font-family:var(--display);font-size:22px;margin-bottom:6px;">Daftar Sebagai Calon Anggota</h2>
-          <p style="font-size:12.5px;color:var(--text-dim);margin-bottom:0;">Formulir contoh — data akan diteruskan ke pangkalan pilihanmu.</p>
+          <p style="font-size:12.5px;color:var(--text-dim);margin-bottom:0;">Formulir contoh — tuliskan nama pangkalan/asal sekolahmu, data akan diteruskan ke sana.</p>
           <form class="jform" id="join-form-el">
             <div>
               <label>Nama Lengkap</label>
@@ -562,12 +568,9 @@
               <input type="email" id="join-email" required placeholder="nama@email.com">
             </div>
             <div>
-              <label>Asal Sekolah / Gugus Depan</label>
-              <input type="text" id="join-sekolah" required placeholder="Contoh: SMAN 1 Denpasar">
-            </div>
-            <div>
-              <label>Pangkalan Tujuan</label>
-              <select id="join-pangkalan" required></select>
+              <label>Pangkalan / Asal Sekolah</label>
+              <input type="text" id="join-pangkalan" required list="join-pangkalan-list" placeholder="Contoh: Pangkalan SMAN 1 Denpasar">
+              <datalist id="join-pangkalan-list"></datalist>
             </div>
             <div>
               <label>Minat Krida</label>
@@ -853,24 +856,39 @@ document.getElementById("dewan-table").innerHTML =
 
 /* ================= NEWS ================= */
 const planeSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 2 L14 9 L21 12 L14 13 L12 22 L10 13 L3 12 L10 9 Z"/></svg>`;
-document.getElementById("news-grid").innerHTML = NEWS.map((n,i)=>`
+document.getElementById("news-grid").innerHTML = NEWS.map((n,i)=>{
+  const bg = n.thumbnail ? ` style="background-image:url('${n.thumbnail}');background-size:cover;background-position:center;"` : "";
+  const icon = n.thumbnail ? "" : planeSvg;
+  return `
   <div class="news-card" onclick="openModal(${i})">
-    <div class="news-thumb"><span class="news-cat">${n.cat}</span>${planeSvg}</div>
+    <div class="news-thumb${n.thumbnail ? ' has-photo' : ''}"${bg}><span class="news-cat">${n.cat}</span>${icon}</div>
     <div class="news-body">
       <div class="news-date">${n.date}</div>
       <h3>${n.title}</h3>
       <p>${n.excerpt}</p>
       <div class="news-link">Baca selengkapnya →</div>
     </div>
-  </div>`).join("");
+  </div>`;
+}).join("");
 
 function openModal(i){
   const n = NEWS[i];
+  const heroEl = document.getElementById("modal-hero");
+  if(n.thumbnail){
+    heroEl.style.display = "";
+    heroEl.style.backgroundImage = `url('${n.thumbnail}')`;
+  } else {
+    heroEl.style.display = "none";
+    heroEl.style.backgroundImage = "";
+  }
   document.getElementById("modal-cat").textContent = n.cat;
   document.getElementById("modal-date").textContent = n.date;
+  document.getElementById("modal-author").textContent = n.penulis ? `Oleh ${n.penulis}` : "";
   document.getElementById("modal-title").textContent = n.title;
-  document.getElementById("modal-content").innerHTML = `<p>${n.content}</p>`;
+  const paragraf = Array.isArray(n.content) && n.content.length ? n.content : [n.content || ""];
+  document.getElementById("modal-content").innerHTML = paragraf.map(p=>`<p>${p}</p>`).join("");
   document.getElementById("news-modal").classList.add("open");
+  document.getElementById("news-modal").querySelector(".article-body").scrollTop = 0;
 }
 function closeModal(){ document.getElementById("news-modal").classList.remove("open"); }
 document.getElementById("news-modal").addEventListener("click", e=>{ if(e.target.id==="news-modal") closeModal(); });
@@ -979,9 +997,12 @@ function renderMembers(){
 renderMembers();
 
 /* ================= AYO GABUNG (FORM) ================= */
-const joinPangkalanSel = document.getElementById("join-pangkalan");
-joinPangkalanSel.insertAdjacentHTML("beforeend", `<option value="">Belum ditentukan</option>`);
-PANGKALAN.forEach(p=>joinPangkalanSel.insertAdjacentHTML("beforeend", `<option value="${p.id}">${p.nama} (${p.kota})</option>`));
+const joinPangkalanInput = document.getElementById("join-pangkalan");
+const joinPangkalanList = document.getElementById("join-pangkalan-list");
+// Saran nama pangkalan yang sudah ada, supaya pendaftar tidak membuat nama
+// ganda karena typo — tapi tetap bisa mengetik nama pangkalan/sekolah baru
+// yang belum ada di daftar.
+PANGKALAN.forEach(p=>joinPangkalanList.insertAdjacentHTML("beforeend", `<option value="${p.nama}"></option>`));
 const joinKridaSel = document.getElementById("join-krida");
 KRIDA_NAMES.forEach(k=>joinKridaSel.insertAdjacentHTML("beforeend", `<option value="${k}">${k}</option>`));
 
@@ -995,8 +1016,7 @@ document.getElementById("join-form-el").addEventListener("submit", function(e){
   const payload = {
     nama: document.getElementById("join-nama").value.trim(),
     email: document.getElementById("join-email").value.trim(),
-    asal_sekolah: document.getElementById("join-sekolah").value.trim(),
-    pangkalan_id: joinPangkalanSel.value || null,
+    pangkalan_nama: joinPangkalanInput.value.trim(),
     krida: joinKridaSel.value,
     no_hp: document.getElementById("join-wa").value.trim(),
   };
@@ -1196,7 +1216,10 @@ function initMap(){
   }).addTo(map);
 
   const markers = {};
-  PANGKALAN.forEach(p=>{
+  // Pangkalan yang otomatis dibuat dari formulir pendaftaran belum tentu
+  // punya koordinat (diisi admin belakangan), jadi marker peta dilewati
+  // untuk pangkalan tanpa lat/lng — tapi tetap muncul di daftar sisi peta.
+  PANGKALAN.filter(p=>p.lat!=null && p.lng!=null).forEach(p=>{
     const members = MEMBERS.filter(m=>m.pangkalanId===p.id);
     const aktifCount = members.filter(m=>m.status==="Aktif").length;
     const radius = 8 + members.length*1.3;
@@ -1218,7 +1241,7 @@ function initMap(){
     const count = MEMBERS.filter(m=>m.pangkalanId===p.id).length;
     return `<div class="pangkalan-item" data-id="${p.id}">
       <h4>${p.nama}</h4>
-      <div class="loc">${p.kota}</div>
+      <div class="loc">${p.kota ?? 'Lokasi belum diatur'}</div>
       <div class="count">${count} anggota</div>
     </div>`;
   }).join("");
@@ -1226,7 +1249,7 @@ function initMap(){
   listEl.querySelectorAll(".pangkalan-item").forEach(item=>{
     item.addEventListener("click", ()=>{
       const p = PANGKALAN.find(x=>String(x.id)===item.dataset.id);
-      if(!p) return;
+      if(!p || p.lat==null || p.lng==null) return;
       map.setView([p.lat,p.lng], 12, {animate:true});
       markers[p.id]?.openPopup();
     });

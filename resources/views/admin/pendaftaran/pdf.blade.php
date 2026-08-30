@@ -69,9 +69,9 @@
             <tr>
                 <th style="width: 4%;">No</th>
                 <th style="width: 12%;">Kode</th>
-                <th style="width: 16%;">Nama &amp; Asal Sekolah</th>
+                <th style="width: 16%;">Nama</th>
                 <th style="width: 18%;">Kontak</th>
-                <th style="width: 14%;">Pangkalan Tujuan</th>
+                <th style="width: 14%;">Pangkalan/Asal Sekolah</th>
                 <th style="width: 10%;">Krida</th>
                 <th style="width: 12%;">Status</th>
                 <th style="width: 14%;">Tanggal Daftar</th>
@@ -83,14 +83,13 @@
                     <td>{{ $i + 1 }}</td>
                     <td>{{ $registration->kode_pendaftaran }}</td>
                     <td>
-                        {{ $registration->nama }}<br>
-                        <span class="muted">{{ $registration->asal_sekolah }}</span>
+                        {{ $registration->nama }}
                     </td>
                     <td>
                         {{ $registration->email }}<br>
                         <span class="muted">{{ $registration->no_hp }}</span>
                     </td>
-                    <td>{{ $registration->pangkalan?->nama ?? '-' }}</td>
+                    <td>{{ $registration->pangkalan?->nama ?? $registration->asal_sekolah }}</td>
                     <td>{{ $registration->krida ?? '-' }}</td>
                     <td>
                         @php

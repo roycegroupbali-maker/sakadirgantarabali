@@ -28,8 +28,7 @@
 <p style="margin:0 0 8px;font-size:14px;">Ringkasan data pendaftaran Anda:</p>
 <table role="presentation" width="100%" cellpadding="6" cellspacing="0" style="font-size:13.5px;color:#334155;">
 <tr><td style="width:150px;color:#64748b;">Nama</td><td>{{ $registration->nama }}</td></tr>
-<tr><td style="color:#64748b;">Asal Sekolah/Gudep</td><td>{{ $registration->asal_sekolah }}</td></tr>
-<tr><td style="color:#64748b;">Pangkalan Tujuan</td><td>{{ $registration->pangkalan?->nama ?? '-' }}</td></tr>
+<tr><td style="color:#64748b;">Pangkalan/Asal Sekolah</td><td>{{ $registration->pangkalan?->nama ?? $registration->asal_sekolah }}</td></tr>
 <tr><td style="color:#64748b;">Minat Krida</td><td>{{ $registration->krida ?? '-' }}</td></tr>
 <tr><td style="color:#64748b;">Nomor WhatsApp</td><td>{{ $registration->no_hp }}</td></tr>
 <tr><td style="color:#64748b;">Status</td><td>{{ $registration->status }}</td></tr>

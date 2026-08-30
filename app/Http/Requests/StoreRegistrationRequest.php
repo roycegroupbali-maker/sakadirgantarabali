@@ -19,8 +19,7 @@ class StoreRegistrationRequest extends FormRequest
         return [
             'nama' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255'],
-            'asal_sekolah' => ['required', 'string', 'max:255'],
-            'pangkalan_id' => ['nullable', 'exists:pangkalans,id'],
+            'pangkalan_nama' => ['required', 'string', 'max:255'],
             'krida' => ['nullable', 'string', 'max:255'],
             'no_hp' => ['required', 'string', 'max:20'],
         ];
@@ -29,8 +28,7 @@ class StoreRegistrationRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'asal_sekolah' => 'asal sekolah/gugus depan',
-            'pangkalan_id' => 'pangkalan tujuan',
+            'pangkalan_nama' => 'pangkalan/asal sekolah',
             'no_hp' => 'nomor WhatsApp',
         ];
     }
