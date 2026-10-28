@@ -169,6 +169,7 @@
     "Persebaran Anggota di Pulau Bali": "Member Distribution on the Island of Bali",
     "Klik penanda atau daftar pangkalan untuk melihat jumlah dan daftar anggota di lokasi tersebut.": "Click a marker or the base list to see the number and list of members at that location.",
     "Lokasi belum diatur": "Location not set",
+    "Belum Terdaftar": "Not Yet Registered",
     "Layanan Publik": "Public Service",
     "Layanan Aspirasi & Pelaporan Masyarakat": "Public Aspiration & Reporting Service",
     "Sampaikan laporan, aspirasi, atau permohonan yang berkaitan dengan kegiatan pengabdian masyarakat Saka Dirgantara di bidang kedirgantaraan.": "Submit reports, aspirations, or requests related to Saka Dirgantara's community service activities in the aerospace field.",
@@ -392,6 +393,9 @@
     if (rec && rec.t === v) return;           // sudah diterjemahkan
     var t = translate(v);
     if (t === null) return;
+    // Label kartu anggota ("Pangkalan") berbentuk tunggal: "Base", bukan "Bases" seperti label statistik.
+    var pn = node.parentNode;
+    if (pn && pn.classList && pn.classList.contains('k') && norm(v) === 'Pangkalan') t = 'Base';
     var out = wrapWhitespace(v, t);
     records.set(node, { o: v, t: out });
     node.nodeValue = out;

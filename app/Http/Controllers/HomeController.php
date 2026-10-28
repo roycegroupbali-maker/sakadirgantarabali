@@ -21,6 +21,9 @@ class HomeController extends Controller
         9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
     ];
 
+    /** Label untuk anggota yang pangkalannya belum terdata/terdaftar. */
+    private const PANGKALAN_BELUM_TERDAFTAR = 'Belum Terdaftar';
+
     /**
      * Tampilkan halaman publik (SPA satu halaman).
      *
@@ -77,12 +80,11 @@ class HomeController extends Controller
                 'lng' => $p->lng,
             ])->values();
 
-        // Hanya anggota yang sudah punya pangkalan yang ditampilkan di peta sebaran
-        // & daftar publik, karena tampilan lama membutuhkan lokasi (lat/lng) untuk
-        // setiap anggota. Anggota tanpa pangkalan tetap tersimpan di database dan
-        // bisa dilengkapi kapan saja lewat Panel Admin.
+        // Semua anggota tampil di daftar publik. Anggota yang belum punya pangkalan
+        // diberi label "Belum Terdaftar" dan otomatis tidak dihitung di peta
+        // sebaran (peta hanya membaca anggota yang memiliki pangkalanId). Pangkalan
+        // dapat dilengkapi kapan saja lewat Panel Admin.
         $membersData = Member::query()
-            ->whereNotNull('pangkalan_id')
             ->with('pangkalan')
             ->orderBy('nama')
             ->get()
@@ -95,10 +97,10 @@ class HomeController extends Controller
                     'id' => $m->nomor_anggota,
                     'nama' => $m->nama,
                     'angkatan' => $m->angkatan ?? '-',
-                    'pangkalan' => $m->pangkalan->nama,
-                    'kota' => $m->pangkalan->kota,
-                    'lat' => $m->pangkalan->lat,
-                    'lng' => $m->pangkalan->lng,
+                    'pangkalan' => $m->pangkalan?->nama ?? self::PANGKALAN_BELUM_TERDAFTAR,
+                    'kota' => $m->pangkalan?->kota,
+                    'lat' => $m->pangkalan?->lat,
+                    'lng' => $m->pangkalan?->lng,
                     'pangkalanId' => $m->pangkalan_id,
                     'krida' => $m->krida ?? '-',
                     'sertifikasi' => $sertifikasi,

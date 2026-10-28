@@ -737,6 +737,8 @@ const KRIDA = [
    items:["Dukungan kegiatan penerbangan","Search and Rescue (SAR)","Pelayanan masyarakat","Kegiatan sosial"]},
 ];
 const KRIDA_NAMES = KRIDA.map(k=>k.name);
+// Database menyimpan nama krida singkat; filter memakai nama lengkap.
+const KRIDA_ALIAS = {Ordirga:"Olahraga Dirgantara", Pengetahuan:"Pengetahuan Dirgantara", Jasa:"Jasa Kedirgantaraan"};
 
 const TUJUAN = [
   "Meningkatkan pengetahuan dan keterampilan anggota Pramuka di bidang kedirgantaraan.",
@@ -767,6 +769,7 @@ const KEGIATAN = [
    Panel Admin → Data Anggota. */
 const PANGKALAN = @json($pangkalanData);
 const MEMBERS = @json($membersData);
+const BELUM_TERDAFTAR = "Belum Terdaftar";   // label pangkalan untuk anggota yang pangkalannya belum terdata
 
 /* Data Dirga News — diambil dari database (tabel dirga_news) melalui HomeController.
    Struktur objek (cat, date, title, excerpt, content) sengaja disamakan persis
@@ -981,6 +984,7 @@ const selAngkatan = document.getElementById("filter-angkatan");
 ANGKATAN.forEach(a=>selAngkatan.insertAdjacentHTML("beforeend", `<option value="${a}">${a}</option>`));
 const selPangkalan = document.getElementById("filter-pangkalan");
 PANGKALAN.forEach(p=>selPangkalan.insertAdjacentHTML("beforeend", `<option value="${p.nama}">${p.nama}</option>`));
+if(MEMBERS.some(m=>m.pangkalanId==null)) selPangkalan.insertAdjacentHTML("beforeend", `<option value="${BELUM_TERDAFTAR}">${BELUM_TERDAFTAR}</option>`);
 const selKrida = document.getElementById("filter-krida");
 KRIDA_NAMES.forEach(k=>selKrida.insertAdjacentHTML("beforeend", `<option value="${k}">${k}</option>`));
 
@@ -997,7 +1001,7 @@ function renderMembers(){
     if(fStatus && m.status!==fStatus) return false;
     if(fAngkatan && m.angkatan!==fAngkatan) return false;
     if(fPangkalan && m.pangkalan!==fPangkalan) return false;
-    if(fKrida && m.krida!==fKrida) return false;
+    if(fKrida && (KRIDA_ALIAS[m.krida]||m.krida)!==fKrida) return false;
     if(!q) return true;
     const hay = [m.nama,m.angkatan,m.pangkalan,m.kota,m.krida,m.sertifikasi,m.jabatan,m.status,m.id].join(" ").toLowerCase();
     return hay.includes(q);
@@ -1022,7 +1026,7 @@ function renderMembers(){
       </div>
       <div class="mcard-info">
         <div><span class="k">Angkatan</span><span class="v">${m.angkatan}</span></div>
-        <div><span class="k">Pangkalan</span><span class="v">${m.pangkalan}</span></div>
+        <div><span class="k">Pangkalan</span><span class="v"${m.pangkalanId==null?' style="color:var(--text-dim);font-style:italic"':''}>${m.pangkalan}</span></div>
         <div><span class="k">Krida</span><span class="v">${m.krida}</span></div>
         <div><span class="k">Sertifikasi</span><span class="v">${m.sertifikasi}</span></div>
         <div><span class="k">Jabatan</span><span class="v">${m.jabatan}</span></div>
