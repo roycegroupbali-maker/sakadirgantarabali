@@ -403,7 +403,7 @@
         <div class="lap-form-wrap">
           <form id="lap-form">
             <div class="lap-form-section">
-              <h5>Informasi Pelapor</h5>
+              <h5>Informasi Pelapor / Permohonan edukasi</h5>
               <div class="lap-form-row">
                 <div class="lap-field"><label>Nama Lengkap <span class="req">*</span></label><input type="text" id="lap-nama" required placeholder="Nama sesuai identitas"></div>
                 <div class="lap-field"><label>Email <span class="req">*</span></label><input type="email" id="lap-email" required placeholder="nama@email.com"></div>
@@ -416,7 +416,7 @@
             </div>
 
             <div class="lap-form-section">
-              <h5>Detail Laporan</h5>
+              <h5>Detail Laporan / Permohonan edukasi</h5>
               <div class="lap-form-row">
                 <div class="lap-field">
                   <label>Kategori <span class="req">*</span></label>
@@ -435,7 +435,7 @@
             </div>
 
             <div class="lap-form-section">
-              <h5>Upload Bukti</h5>
+              <h5>Upload Bukti / permohonan</h5>
               <div class="lap-form-row single">
                 <div class="lap-field">
                   <label>File Pendukung</label>
