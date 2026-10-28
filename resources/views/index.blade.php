@@ -9,7 +9,39 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-@vite(['resources/css/style.css', 'resources/css/accessibility-widget.css', 'resources/js/accessibility.js'])
+@vite(['resources/css/style.css', 'resources/css/accessibility-widget.css', 'resources/js/accessibility.js', 'resources/js/i18n.js'])
+<style>
+/* Pengalih bahasa ID / EN (header) */
+nav.wrap .navlinks{margin-left:auto;}
+.lang-switch{display:flex;flex-shrink:0;margin-left:14px;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;}
+.lang-switch button{background:none;border:none;color:var(--text-muted);font-family:var(--mono);font-size:11.5px;letter-spacing:0.08em;padding:9px 11px;cursor:pointer;transition:.15s;}
+.lang-switch button + button{border-left:1px solid var(--line);}
+.lang-switch button:hover{color:var(--text);}
+.lang-switch button.active{background:var(--gold);color:var(--navy-950);font-weight:600;}
+.navburger{margin-left:10px;}
+@media(min-width:1181px){
+  .navlinks{gap:0;}
+  .navlinks button{padding:10px 9px;white-space:nowrap;}
+  .navlinks button.cta-join{padding:9px 12px;margin-left:4px;}
+  .lang-switch{margin-left:10px;}
+  .brand-text b{white-space:nowrap;}
+}
+/* Menu hamburger dipakai hingga lebar 1180px agar tombol bahasa muat di header */
+@media(max-width:1180px){
+  .navlinks{position:fixed;top:78px;left:0;right:0;background:var(--navy-950);flex-direction:column;align-items:stretch;border-bottom:1px solid var(--line);padding:8px 0;display:none;margin-left:0;}
+  .navlinks.open{display:flex;}
+  .navlinks button{text-align:left;padding:14px 28px;}
+  .navlinks button.cta-join{margin:8px 28px;text-align:center;}
+  .navburger{display:block;}
+  .lang-switch{margin-left:auto;}
+}
+@media(max-width:480px){
+  nav.wrap{padding:0 16px;}
+  .brand{gap:10px;}
+  .brand-text b{font-size:14px;}
+  .lang-switch button{padding:8px 9px;}
+}
+</style>
 </head>
 <body>
 
@@ -32,6 +64,10 @@
       <button data-page="layanan">Layanan Aspirasi</button>
       <button data-page="kontak">Kontak</button>
       <button data-page="gabung" class="cta-join">Ayo Gabung →</button>
+    </div>
+    <div class="lang-switch" role="group" aria-label="Bahasa / Language">
+      <button type="button" data-lang="id" class="active" aria-pressed="true">ID</button>
+      <button type="button" data-lang="en" aria-pressed="false">EN</button>
     </div>
     <button class="navburger" id="navburger">☰</button>
   </nav>
@@ -364,7 +400,7 @@
       </div>
       <div class="map-layout">
         <div class="map-sidebar">
-          <div class="map-sidebar-head">10 Pangkalan</div>
+          <div class="map-sidebar-head" id="pangkalan-count">10 Pangkalan</div>
           <div id="pangkalan-list"></div>
         </div>
         <div id="map"></div>
@@ -811,6 +847,7 @@ document.getElementById("navburger").addEventListener("click",()=>document.getEl
 document.getElementById("stat-total").textContent = MEMBERS.length;
 document.getElementById("stat-aktif").textContent = MEMBERS.filter(m=>m.status==="Aktif").length;
 document.getElementById("stat-pangkalan").textContent = PANGKALAN.length;
+document.getElementById("pangkalan-count").textContent = PANGKALAN.length + " Pangkalan";
 
 /* ================= TUJUAN ================= */
 document.getElementById("tujuan-list").innerHTML = TUJUAN.map((t,i)=>`

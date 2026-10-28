@@ -95,8 +95,6 @@ class AnggotaBaruSeeder extends Seeder
     /** Krida diisi bergantian (data sementara, silakan diedit di Panel Admin). */
     private array $kridaList = ['Ordirga', 'Jasa', 'Pengetahuan'];
 
-    private int $kridaIdx = 0;
-
     /** Nama pangkalan di daftar => nama pangkalan yang sudah ada di database. */
     private array $pangkalanAlias = [
         'SMK Bintang Persada Denpasar' => 'SMK Bintang Persada',
@@ -158,30 +156,40 @@ class AnggotaBaruSeeder extends Seeder
     private function simpan(string $nama, string $jk, ?string $pangkalan, int $angkatan, int $urut): void
     {
         $namaDb = $this->namaAlias[$nama] ?? $nama;
+        $angkatanLabel = $this->angkatanLabel[$angkatan];
+        $posisi = ($angkatan === 17 ? 0 : 29) + $urut - 1;
+        $krida = $this->kridaList[$posisi % count($this->kridaList)];
+        $pangkalanId = $this->pangkalanId($pangkalan);
 
         $existing = Member::whereRaw('LOWER(nama) = ?', [mb_strtolower($namaDb)])->first();
 
         if ($existing) {
-            // Anggota lama: hanya isi angkatan jika masih kosong, data lain tidak diubah.
+            // Anggota yang sudah ada: lengkapi yang masih kosong saja, data lain tidak ditimpa.
+            $data = [];
+
             if (! $existing->angkatan) {
-                $existing->update(['angkatan' => $this->angkatanLabel[$angkatan]]);
+                $data['angkatan'] = $angkatanLabel;
+            }
+            if (! $existing->krida) {
+                $data['krida'] = $krida;
+            }
+            if (! $existing->pangkalan_id && $pangkalanId) {
+                $data['pangkalan_id'] = $pangkalanId;
+                $data['asal_sekolah'] = $existing->asal_sekolah ?: $pangkalan;
+            }
+            // Bersihkan sisa data dari versi seeder lama.
+            if (str_starts_with((string) $existing->jabatan, 'Korim')) {
+                $data['jabatan'] = 'Anggota';
+            }
+            if (str_starts_with((string) $existing->nomor_anggota, 'KORIM')) {
+                $data['nomor_anggota'] = $this->nomorBerikutnya();
+            }
+
+            if ($data) {
+                $existing->update($data);
             }
 
             return;
-        }
-
-        $pangkalanId = null;
-
-        if ($pangkalan) {
-            $namaPangkalan = $this->pangkalanAlias[$pangkalan] ?? $pangkalan;
-            $lokasi = $this->lokasi[$namaPangkalan] ?? [];
-            $model = Pangkalan::firstOrCreate(['nama' => $namaPangkalan], $lokasi);
-
-            if ($lokasi && $model->lat === null) {
-                $model->update($lokasi);
-            }
-
-            $pangkalanId = $model->id;
         }
 
         Member::create([
@@ -190,10 +198,27 @@ class AnggotaBaruSeeder extends Seeder
             'jenis_kelamin' => $jk,
             'asal_sekolah' => $pangkalan,
             'pangkalan_id' => $pangkalanId,
-            'angkatan' => $this->angkatanLabel[$angkatan],
-            'krida' => $this->kridaList[$this->kridaIdx++ % count($this->kridaList)],
+            'angkatan' => $angkatanLabel,
+            'krida' => $krida,
             'jabatan' => 'Anggota',
             'status' => 'Aktif',
         ]);
+    }
+
+    private function pangkalanId(?string $pangkalan): ?int
+    {
+        if (! $pangkalan) {
+            return null;
+        }
+
+        $namaPangkalan = $this->pangkalanAlias[$pangkalan] ?? $pangkalan;
+        $lokasi = $this->lokasi[$namaPangkalan] ?? [];
+        $model = Pangkalan::firstOrCreate(['nama' => $namaPangkalan], $lokasi);
+
+        if ($lokasi && $model->lat === null) {
+            $model->update($lokasi);
+        }
+
+        return $model->id;
     }
 }
